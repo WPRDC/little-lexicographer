@@ -2,7 +2,7 @@ import re, sys, csv
 
 from collections import OrderedDict
 
-type_hierarchy = {None: -1, 'text': 0, 'bool': 1, 'int': 2, 'float': 3} # by test stringency
+type_hierarchy = {None: -1, 'text': 0, 'bool': 1, 'int': 2, 'float': 3} # Ranked by test stringency
 
 def test_type(value,candidate):
     if value =='':
@@ -29,9 +29,7 @@ def test_type(value,candidate):
             return True
         return False
         #try:
-        #    print(value,x)
         #    x = float(value)
-        #    print(value,x)
         #except:
         #    return False
         #return True
