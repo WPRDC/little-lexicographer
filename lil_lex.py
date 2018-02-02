@@ -59,7 +59,7 @@ def main():
     else:
         csv_file_path = sys.argv[1]
         if re.search('\.csv$', csv_file_path) is None:
-            print('This whole fragile thing fals apart if the file name does not end in ".csv". Sorry.')
+            print('This whole fragile thing falls apart if the file name does not end in ".csv". Sorry.')
         else:
             with open(csv_file_path) as csvfile:
                 reader = csv.DictReader(csvfile)
