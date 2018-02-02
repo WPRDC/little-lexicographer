@@ -1,5 +1,6 @@
 *.pyc
 TODO
 *.swp
+tangents/
 *.csv
 !examples/*.csv
