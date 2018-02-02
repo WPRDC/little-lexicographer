@@ -43,4 +43,4 @@ letters|text|Single letters, randomly sampled from the alphabet.|y|
 constants|float|These are all well-known mathematical constants.|2.7182818284|
 truth_values|bool|Boolean values.|True|
 
-Once your data dictionary files is filled in, it's ready for uploading to CKAN.
+Once your data dictionary file is filled in, it's ready for uploading to CKAN.
