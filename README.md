@@ -25,11 +25,11 @@ then running lil_lex.py on it like so,
 > python lil_lex.py example.csv
 ```
 
-will generate a file in the same directory as example.csv called example-data-dictionary.csv. Its tabular form looks like this:
+will generate a file in the same directory as example.csv called example-data-dictionary.csv. Its tabular form looks kind of like this:
 
 field_name|type|description|example|notes
 ----------|----|-----------|-------|-----
-numbers|int||34|
+numbers|int||34|"This is an example note I added, just to demonstrate the importance of putting quotes around any field value that contains a comma, lest it be interpreted as more fields than one."
 letters|text||y|
 constants|float||2.7182818284|
 truth_values|bool||True|
