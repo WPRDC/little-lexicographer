@@ -1,4 +1,5 @@
 *.pyc
 TODO
-*.csv
 *.swp
+*.csv
+!examples/*.csv
