@@ -36,4 +36,11 @@ truth_values|bool||True|
 
 Then all you have to do is check that the types are right and fill in the blanks. (Values can easily be inserted into CSVs in your favorite text editor of course, but I enjoy using [VisiData](https://github.com/saulpw/visidata) for editing CSV files since it makes viewing and manipulating CSV files in a terminal window so easy (so long as you're willing to learn some keyboard shortcuts).)
 
+field_name|type|description|example|notes
+----------|----|-----------|-------|-----
+numbers|int|This field contains integers.|34|"This is an example note I added, just to demonstrate the importance of putting quotes around any field value that contains a comma, lest it be interpreted as more fields than one."
+letters|text|Single letters, randomly sampled from the alphabet.|y|
+constants|float|These are all well-known mathematical constants.|2.7182818284|
+truth_values|bool|Boolean values.|True|
+
 Once your data dictionary files is filled in, it's ready for uploading to CKAN.
