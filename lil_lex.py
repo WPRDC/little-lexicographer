@@ -15,7 +15,7 @@ def test_type(value,candidate):
         return True
 
     if candidate == 'int':
-        if re.match('-?\d+',value) is not None:
+        if re.match('^-?\d+$',value) is not None:
             return True
         return False
         #try:
@@ -25,7 +25,7 @@ def test_type(value,candidate):
         #return True
 
     if candidate == 'float':
-        if re.match('-?\d*\.\d+',value) is not None or re.match('-?\d+\.\d*',value) is not None:
+        if re.match('^-?\d*\.\d+$',value) is not None or re.match('^-?\d+\.\d*$',value) is not None:
             return True
         return False
         #try:
@@ -69,6 +69,9 @@ def main():
                 types = []
                 rows = list(reader) # This is necessary since if you just iterate over 
                 # the reader once, you can't use it again without doing something.
+                # Remove the _id field added by CKAN, if it's there.
+                if '_id' in headers:
+                    headers.remove('_id')
                 for n,field in enumerate(headers):
                     field_type = None
                     value_example = None
@@ -93,9 +96,6 @@ def main():
                     examples.append(value_example)
 
 
-            # Remove the _id field added by CKAN, if it's there.
-            if '_id' in headers:
-                headers.remove('_id')
             list_of_dicts = []
             for n,field in enumerate(headers):
                 tuples = [('field_name', field),
