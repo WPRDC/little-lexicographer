@@ -79,7 +79,7 @@ def main():
 
                     for row in rows:
                         if field in row:
-                            if row[field] is not None and value_example is None:
+                            if row[field] not in [None,''] and value_example is None:
                                 value_example = row[field]
                             # Type elimination by brute force
                             if row[field] is not None:
@@ -91,9 +91,10 @@ def main():
                     if field_type is None:
                         raise ValueError("No values found for the field {}.".format(field))
                     if value_example is None:
-                        raise ValueError("values: No values found for the field {}.".format(value_example))
-                    types.append(field_type)
+                        raise ValueError("values: No values found for the field {}.".format(field))
                     examples.append(value_example)
+                    types.append(field_type)
+
 
 
             list_of_dicts = []
