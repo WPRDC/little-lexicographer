@@ -53,7 +53,7 @@ def main():
     if len(sys.argv) < 2:
         print("Please specify the name of the CSV file for which you want to generate")
         print('a data dictionary as a command-line argument. For example:')
-        print('      > python lillex.py robot_census.csv')
+        print('      > python lil_lex.py robot_census.csv')
     elif len(sys.argv) > 2:
         print("This script is not yet ready to handle more than one file at a time.")
     else:
