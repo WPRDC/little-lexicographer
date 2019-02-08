@@ -89,9 +89,9 @@ def main():
                     field_type = choose_type(type_options)
                     print(field,field_type,type_options)
                     if field_type is None:
-                        raise ValueError("No values found for the field {}.".format(field))
+                        print("No values found for the field {}.".format(field))
                     if value_example is None:
-                        raise ValueError("values: No values found for the field {}.".format(field))
+                        print("values: No values found for the field {}.".format(field))
                     examples.append(value_example)
                     types.append(field_type)
 
