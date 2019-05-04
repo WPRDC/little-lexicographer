@@ -49,6 +49,20 @@ def choose_type(options):
             selection = option
     return selection
 
+def detect_case(s):
+    if s == s.upper():
+        return 'upper'
+    if s == s.lower():
+        if re.sub("[^a-zA-Z0-9]*","_",s.lower()) == s:
+            return 'snake_case'
+        return 'lower'
+    sp = re.sub("[^a-zA-Z0-9]+","_",s)
+    words = sp.split("_")
+    if all([word == word.capitalize() for word in words]):
+        return 'capitalized'
+
+    return 'Unknown' # Work on detecting camelCase
+
 def main():
     if len(sys.argv) < 2:
         print("Please specify the name of the CSV file for which you want to generate")
