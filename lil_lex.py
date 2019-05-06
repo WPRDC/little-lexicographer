@@ -42,7 +42,7 @@ def test_type(value,candidate):
     # Dates, times, and datetimes are more difficult to deal with.
     # I'll also save JSON for later.
 
-def choose_type(options):
+def choose_type(options,values):
     selection = None
     for option in options:
         if type_hierarchy[option] > type_hierarchy[selection]:
@@ -52,16 +52,32 @@ def choose_type(options):
 def detect_case(s):
     if s == s.upper():
         return 'upper'
-    if s == s.lower():
-        if re.sub("[^a-zA-Z0-9]*","_",s.lower()) == s:
-            return 'snake_case'
-        return 'lower'
+    if re.sub("[^a-zA-Z0-9]+","_",s.lower()) == s:
+        return 'snake_case'
     sp = re.sub("[^a-zA-Z0-9]+","_",s)
     words = sp.split("_")
     if all([word == word.capitalize() for word in words]):
         return 'capitalized'
-
+    if re.match('([A-Z0-9]*[a-z][a-z0-9]*[A-Z]|[a-z0-9]*[A-Z][A-Z0-9]*[a-z])[A-Za-z0-9]*',s) is not None:
+        return 'camelCase'
     return 'Unknown' # Work on detecting camelCase
+
+def camelCase_to_snake_case(s):
+    REG = r"(.+?)([A-Z])"
+    def snake(match):
+        return match.group(1).lower() + "_" + match.group(2).lower()
+    return re.sub(REG, snake, s, 0)
+
+def snake_case(s):
+    inferred_case = detect_case(s)
+    if inferred_case in ['upper','capitalized','snake_case']:
+        return re.sub("[^a-zA-Z0-9]+","_",s.lower())
+    if inferred_case in ['camelCase']:
+        return camelCase_to_snake_case(s)
+    best_guess = re.sub("[^a-zA-Z0-9]+","_",s.lower())
+    print("While this function is unnsure how to convert '{}' to snake_case, it's best guess is {}".format(s,best_guess))
+    return best_guess
+
 
 def main():
     if len(sys.argv) < 2:
@@ -100,7 +116,7 @@ def main():
                                 for option in type_options: 
                                     if not test_type(row[field],option):
                                         type_options.remove(option)
-                    field_type = choose_type(type_options)
+                    field_type = choose_type(type_options, [row[field] for row in rows])
                     print(field,field_type,type_options)
                     if field_type is None:
                         print("No values found for the field {}.".format(field))
@@ -128,6 +144,11 @@ def main():
                 writer.writeheader()
                 writer.writerows(list_of_dicts)
 
+            ### ETL Wizard functionality: Generate Marshamallow schema for ETL jobs
+            print("\n\n *** *** ** *  *   * ** *      * ** ***** * *   *")
+            for n,field in enumerate(headers):
+                s = "{} = fields.{}({})".format(snake_case(field), schema_type[types[n]], args(none_count[n]))
+                print(s)
 
 if __name__ == '__main__':
     main()
