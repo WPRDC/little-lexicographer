@@ -122,6 +122,12 @@ def snake_case(s):
     return best_guess
 
 
+def args(nones):
+    if nones == 0:
+        return ''
+    else:
+        return 'allow_none=True'
+
 def main():
     if len(sys.argv) < 2:
         print("Please specify the name of the CSV file for which you want to generate")
@@ -140,7 +146,9 @@ def main():
                 print(headers)
                 examples = []
                 types = []
-                rows = list(reader) # This is necessary since if you just iterate over 
+                none_count = defaultdict(int)
+
+                rows = list(reader) # This is necessary since if you just iterate over
                 # the reader once, you can't use it again without doing something.
                 # Remove the _id field added by CKAN, if it's there.
                 if '_id' in headers:
@@ -152,6 +160,8 @@ def main():
 
                     for row in rows:
                         if field in row:
+                            if row[field] in [None,'']:
+                                none_count[n] += 1
                             if row[field] not in [None,''] and value_example is None:
                                 value_example = row[field]
                             # Type elimination by brute force
