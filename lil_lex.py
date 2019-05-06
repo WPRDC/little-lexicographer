@@ -84,6 +84,14 @@ def choose_type(options,values):
 
     return selection
 
+schema_type = {'text': 'String',
+        'int': 'Integer',
+        'float': 'Float',
+        'bool': 'Boolean',
+        'date': 'Date',
+        'datetime': 'Datetime'}
+# Dates, datetimes, and booleans need to be inferred.
+
 def detect_case(s):
     if s == s.upper():
         return 'upper'
