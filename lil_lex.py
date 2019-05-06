@@ -1,12 +1,29 @@
 import re, sys, csv
 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
+from dateutil import parser
 
-type_hierarchy = {None: -1, 'text': 0, 'bool': 1, 'int': 2, 'float': 3} # Ranked by test stringency
+type_hierarchy = {None: -1, 'text': 0, 'bool': 1, 'int': 2, 'float': 3, 'datetime': 4, 'date': 4} # Ranked by test stringency
 
 def test_type(value,candidate):
+    """Return True if the value might be of type candidate and False only if it is
+    definitely not of type candidate."""
     if value =='':
         return True
+    if candidate == 'datetime':
+        try:
+            x = parser.parse(value)
+            return True
+        except:
+            return False
+
+    if candidate == 'date':
+        try:
+            x = parser.parse(value)
+            return True
+        except:
+            return False
+
     if candidate == 'text':
         try:
             x = str(value)
@@ -42,11 +59,29 @@ def test_type(value,candidate):
     # Dates, times, and datetimes are more difficult to deal with.
     # I'll also save JSON for later.
 
+def date_or_datetime(options,values):
+    # Distinguishing between dates and datetimes could be done on length, but data that comes in like
+    # 2017-04-13 00:00 (with all times equal to midnight) are actually dates.
+    if all([len(v) <= 10 for v in values]): # len('2019-04-13') == 10
+        return 'date'
+    for v in values:
+        if v != '':
+            dt = parser.parse(v)
+            if not(dt.hour == dt.minute == dt.second == 0):
+                return 'datetime'
+    return 'date'
+
 def choose_type(options,values):
     selection = None
     for option in options:
         if type_hierarchy[option] > type_hierarchy[selection]:
             selection = option
+
+    # Distinguishing between dates and datetimes could be done on length, but data that comes in like
+    # 2017-04-13 00:00 (with all times equal to midnight) are actually dates.
+    if selection in ['datetime', 'date']:
+        selection = date_or_datetime(options,values)
+
     return selection
 
 def detect_case(s):
@@ -105,7 +140,7 @@ def main():
                 for n,field in enumerate(headers):
                     field_type = None
                     value_example = None
-                    type_options = ['text','int','float','bool'] #'json','timestamp','time','date']
+                    type_options = ['text','int','float','bool','datetime','date'] #'json','time']
 
                     for row in rows:
                         if field in row:
@@ -113,7 +148,7 @@ def main():
                                 value_example = row[field]
                             # Type elimination by brute force
                             if row[field] is not None:
-                                for option in type_options: 
+                                for option in type_options:
                                     if not test_type(row[field],option):
                                         type_options.remove(option)
                     field_type = choose_type(type_options, [row[field] for row in rows])
