@@ -126,20 +126,25 @@ def is_unique(xs):
         return False
     return True
 
-def args(nones):
-    if nones == 0:
-        return ''
-    else:
-        return 'allow_none=True'
+def args(field,nones,maintain_case):
+    arg_list = []
+    if maintain_case:
+        arg_list.append('dump_to="{}"'.format(field))
+    if nones != 0:
+        arg_list.append('allow_none=True')
+    return ', '.join(arg_list)
 
 def main():
     if len(sys.argv) < 2:
         print("Please specify the name of the CSV file for which you want to generate")
         print('a data dictionary as a command-line argument. For example:')
         print('      > python lil_lex.py robot_census.csv')
-    elif len(sys.argv) > 2:
-        print("This script is not yet ready to handle more than one file at a time.")
     else:
+        maintain_case = False
+        if len(sys.argv) > 2:
+            if 'maintain' in sys.argv[2:]:
+                maintain_case = True
+
         csv_file_path = sys.argv[1]
         if re.search('\.csv$', csv_file_path) is None:
             print('This whole fragile thing falls apart if the file name does not end in ".csv". Sorry.')
@@ -210,7 +215,7 @@ def main():
             ### ETL Wizard functionality: Generate Marshamallow schema for ETL jobs
             print("\n\n *** *** ** *  *   * ** *      * ** ***** * *   *")
             for n,field in enumerate(headers):
-                s = "{} = fields.{}({})".format(snake_case(field), schema_type[types[n]], args(none_count[n]))
+                s = "{} = fields.{}({})".format(snake_case(field), schema_type[types[n]], args(field,none_count[n],maintain_case))
                 print(s)
 
 if __name__ == '__main__':
