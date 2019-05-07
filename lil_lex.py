@@ -121,6 +121,10 @@ def snake_case(s):
     print("While this function is unnsure how to convert '{}' to snake_case, it's best guess is {}".format(s,best_guess))
     return best_guess
 
+def is_unique(xs):
+    if len(xs) > len(set(xs)):
+        return False
+    return True
 
 def args(nones):
     if nones == 0:
@@ -147,6 +151,7 @@ def main():
                 examples = []
                 types = []
                 none_count = defaultdict(int)
+                parameters = defaultdict(lambda: defaultdict(bool))
 
                 rows = list(reader) # This is necessary since if you just iterate over
                 # the reader once, you can't use it again without doing something.
@@ -169,15 +174,20 @@ def main():
                                 for option in type_options:
                                     if not test_type(row[field],option):
                                         type_options.remove(option)
-                    field_type = choose_type(type_options, [row[field] for row in rows])
-                    print(field,field_type,type_options)
+                    field_values = [row[field] for row in rows]
+                    field_type = choose_type(type_options, field_values)
+                    parameters['unique'][field] = is_unique(field_values)
+                    print("{} {} {} {}".format(field, field_type, type_options, "   ALL UNIQUE" if parameters['unique'][field] else "    "))
                     if field_type is None:
                         print("No values found for the field {}.".format(field))
                     if value_example is None:
                         print("values: No values found for the field {}.".format(field))
+                        parameters['empty'][field] = True # Defaults to False because of the defaultdict.
                     examples.append(value_example)
                     types.append(field_type)
 
+            print("\n\nEMPTY FIELDS: {}".format([field for field in parameters['empty'] if parameters['empty'][field]]))
+            print("POTENTIAL PRIMARY KEY FIELDS: {}".format([field for field in parameters['unique'] if parameters['unique'][field]]))
 
 
             list_of_dicts = []
