@@ -84,12 +84,16 @@ def choose_type(options,values):
 
     return selection
 
-schema_type = {'text': 'String',
+base_schema_type = {'text': 'String',
         'int': 'Integer',
         'float': 'Float',
         'bool': 'Boolean',
         'date': 'Date',
         'datetime': 'Datetime'}
+
+types_no_integers = dict(base_schema_type)
+types_no_integers['int'] = 'String'
+
 # Dates, datetimes, and booleans need to be inferred.
 
 def detect_case(s):
@@ -141,9 +145,14 @@ def main():
         print('      > python lil_lex.py robot_census.csv')
     else:
         maintain_case = False
+        no_integers = False
         if len(sys.argv) > 2:
             if 'maintain' in sys.argv[2:]:
                 maintain_case = True
+            if 'no_ints' in sys.argv[2:]:
+                no_integers = True
+            if 'no_integers' in sys.argv[2:]:
+                no_integers = True
 
         csv_file_path = sys.argv[1]
         if re.search('\.csv$', csv_file_path) is None:
@@ -214,6 +223,12 @@ def main():
 
             ### ETL Wizard functionality: Generate Marshamallow schema for ETL jobs
             print("\n\n *** *** ** *  *   * ** *      * ** ***** * *   *")
+            schema_type = base_schema_type
+            if no_integers: # Lots of fields are coded as integers, but we want to switch them
+                # to strings because they are just ID numbers that one should not do math with (like ward IDs).
+                print("Coercing all integer fields to strings, since so many such fields are not actual counts.")
+                schema_type = types_no_integers
+
             for n,field in enumerate(headers):
                 s = "{} = fields.{}({})".format(snake_case(field), schema_type[types[n]], args(field,none_count[n],maintain_case))
                 print(s)
