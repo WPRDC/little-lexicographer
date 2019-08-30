@@ -197,6 +197,7 @@ def main():
                     if value_example is None:
                         print("values: No values found for the field {}.".format(field))
                         parameters['empty'][field] = True # Defaults to False because of the defaultdict.
+                        field_type = 'text' # Override any other field_type and use text when no value was found.
                     examples.append(value_example)
                     types.append(field_type)
 
