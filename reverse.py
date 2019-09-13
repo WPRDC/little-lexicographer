@@ -25,15 +25,19 @@ def main():
                 headers = reader.fieldnames
                 print(headers)
 
-        dictionary_filename = sys.argv[1]
-        list_of_dicts = list(csv.DictReader(open(dictionary_filename)))
+        if 'field_name' in headers:
+            dictionary_filename = sys.argv[1]
+            list_of_dicts = list(csv.DictReader(open(dictionary_filename)))
 
-        fields = [d['field_name'] for d in list_of_dicts]
+            fields = [d['field_name'] for d in list_of_dicts]
 
-        headers_path = re.sub("\.csv","-headers.csv",csv_file_path)
-        with open(headers_path, 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=fields)
-            writer.writeheader()
+            headers_path = re.sub("\.csv","-headers.csv",csv_file_path)
+            with open(headers_path, 'w') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=fields)
+                writer.writeheader()
+            print("Template generated from data dictionary file.")
+        else:
+            print("This script could not find a column named 'field_name', which is where it expects to get the field names from.")
 
 
 if __name__ == '__main__':
