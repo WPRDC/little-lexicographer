@@ -4,3 +4,4 @@ TODO
 tangents/
 *.csv
 !examples/*.csv
+credentials.py
