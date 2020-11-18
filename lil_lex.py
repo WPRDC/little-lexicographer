@@ -13,15 +13,27 @@ def test_type(value,candidate):
     if candidate == 'datetime':
         try:
             x = parser.parse(value)
-            return True
+            if x.isoformat() == value:
+                #print(f"{value} is a datetime.")
+                return True
+            else:
+                #print(f"{value} is NOT a datetime.")
+                return False
         except:
+            #print(f"{value} is NOT a datetime.")
             return False
 
     if candidate == 'date':
         try:
             x = parser.parse(value)
-            return True
+            if x.date().isoformat() == value:
+                #print(f"{value} is a date.")
+                return True
+            else:
+                #print(f"{value} is NOT a date")
+                return False
         except:
+            #print(f"{value} is NOT a date.")
             return False
 
     if candidate == 'text':
@@ -65,7 +77,7 @@ def date_or_datetime(options,values):
     if all([len(v) <= 10 for v in values]): # len('2019-04-13') == 10
         return 'date'
     for v in values:
-        if v != '':
+        if v not in ['', 'NA', 'N/A']:
             dt = parser.parse(v)
             if not(dt.hour == dt.minute == dt.second == 0):
                 return 'datetime'
