@@ -246,5 +246,9 @@ def main():
                 s = "{} = fields.{}({})".format(snake_case(field), schema_type[types[n]], args(field,none_count[n],maintain_case))
                 print(s)
 
+            # [ ] Infer possible primary-key COMBINATIONS.
+            # [ ] Detect field names that need to be put in load_from arguments.
+                # * Sense whether Marshmallow can convert source field name to snake_case name (exceptions?)
+
 if __name__ == '__main__':
     main()
