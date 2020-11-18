@@ -8,7 +8,7 @@ type_hierarchy = {None: -1, 'text': 0, 'bool': 1, 'int': 2, 'float': 3, 'datetim
 def test_type(value,candidate):
     """Return True if the value might be of type candidate and False only if it is
     definitely not of type candidate."""
-    if value =='':
+    if value in ['', 'NA', 'N/A']:
         return True
     if candidate == 'datetime':
         try:
