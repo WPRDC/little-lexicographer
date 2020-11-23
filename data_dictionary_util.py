@@ -51,12 +51,16 @@ def get_data_dictionary(site, resource_id, API_key=None):
     except ckanapi.errors.NotFound: # Either the resource doesn't exist, or it doesn't have a datastore.
         return None
 
-def set_data_dictionary(site, resource_id, old_fields, API_key):
-    # Here "old_fields" needs to be in the same format as the data dictionary
+def set_data_dictionary(site, resource_id, ref_fields, API_key):
+    # Here "ref_fields" needs to be in the same format as the data dictionary
     # returned by get_data_dictionary: a list of type dicts and info dicts.
     # Though the '_id" field needs to be removed for this to work.
-    if old_fields[0]['id'] == '_id':
-        old_fields = old_fields[1:]
+
+    # ref_fields can be the old fields from a data table that is being cleared
+    # or newly synthesized fields from a CSV data-dictionary specification.
+    # In the latter case, the type_override field may be present.
+    if ref_fields[0]['id'] == '_id':
+        ref_fields = ref_fields[1:]
 
     # Note that a subset can be sent, and they will update part of
     # the integrated data dictionary.
@@ -67,7 +71,7 @@ def set_data_dictionary(site, resource_id, old_fields, API_key):
     # Iterate through the fields in the data dictionary and try to apply them to the newly created data table.
     for field in present_fields:
         if field['id'] != '_id':
-            definition = next((f['info'] for f in old_fields if f['id'] == field['id']), None)
+            definition = next((f['info'] for f in ref_fields if f['id'] == field['id']), None)
             if definition is not None:
                 nf = dict(field)
                 nf['info'] = definition
