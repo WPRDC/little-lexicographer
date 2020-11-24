@@ -219,11 +219,11 @@ def main():
 
             list_of_dicts = []
             for n,field in enumerate(headers):
-                tuples = [('field_name', field),
+                tuples = [('column', field),
                         ('type', types[n]),
+                        ('label',''),
                         ('description',''),
-                        ('example',examples[n]),
-                        ('notes','')]
+                        ('example',examples[n])]
 
                 list_of_dicts.append(OrderedDict(tuples))
             row1 = list_of_dicts[0]
