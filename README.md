@@ -54,12 +54,13 @@ Say you have a data dictionary in the above format (with fields `column`, `label
 
 1) Configure your credentials.py script to look something like this:
 
-```API_key = 'long-string-of-alphanumeric-characters-you-got-from-your-data.wprdc.org-user-account'
+```
+API_key = 'long-string-of-alphanumeric-characters-you-got-from-your-data.wprdc.org-user-account'
 site = 'https://data.wprdc.org'
 ```
 2) Run this script:
 
-> python upload_data_dictionary.py path-to-your-data-dictionary.csv <CKAN-resource-ID-for-table-of-interest>
+> python upload_data_dictionary.py path-to-your-data-dictionary.csv \<CKAN-resource-ID-for-table-of-interest\>
 
 The data dictionary should be uploaded, filling in `label` and `description` values for the corresponding fields.
 
@@ -70,6 +71,6 @@ Then you have to log in to your CKAN account on data.wprdc.org, find the resourc
 
 Run
 
-> python clone_data_dictionary.py <CKAN-source-resource-ID> <CKAN-destination-resource-ID>
+> python clone_data_dictionary.py \<CKAN-source-resource-ID\> \<CKAN-destination-resource-ID\>
 
 to apply the `label` and `description` values from the source resource to any corresponding fields in the destination resource.
