@@ -243,7 +243,7 @@ def main():
                 schema_type = types_no_integers
 
             for n,field in enumerate(headers):
-                s = "{} = fields.{}({})".format(snake_case(field), schema_type[types[n]], args(field,none_count[n],maintain_case))
+                s = f"{snake_case(field)} = fields.{schema_type[types[n]]}({args(field, none_count[n], maintain_case)})"
                 print(s)
 
             # [ ] Infer possible primary-key COMBINATIONS.
