@@ -1,4 +1,4 @@
-field_name,type,description,example,notes
+column,type,label,example,description
 numbers,int,,34,"This is an example note I added, just to demonstrate the importance of putting quotes around any field value that contains a comma, lest it be interpreted as more fields than one."
 letters,text,,y,
 constants,float,,2.7182818284,

@@ -1,4 +1,4 @@
-field_name,type,description,example,notes
+column,type,label,example,description
 book_title,text,The title of the book.,On Beyond Zebra!,"Typically if there is a subtitle, the main title is separated from the subtitle by a colon."
 author,text,The name of the person who wrote the book.,Dr. Seuss,This may be a pen name.
 year,int,The year that the book was first published.,1955,
