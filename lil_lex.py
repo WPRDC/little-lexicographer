@@ -142,10 +142,11 @@ def is_unique(xs):
         return False
     return True
 
-def args(field,nones,maintain_case):
+def args(field, nones, maintain_case):
     arg_list = []
+    arg_list.append(f"load_from='{field}'.lower()")
     if maintain_case:
-        arg_list.append('dump_to="{}"'.format(field))
+        arg_list.append(f'dump_to="{field}"')
     if nones != 0:
         arg_list.append('allow_none=True')
     return ', '.join(arg_list)
