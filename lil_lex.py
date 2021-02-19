@@ -134,7 +134,7 @@ def snake_case(s):
     if inferred_case in ['camelCase']:
         return camelCase_to_snake_case(s)
     best_guess = re.sub("[^a-zA-Z0-9]+","_",s.lower())
-    print("While this function is unnsure how to convert '{}' to snake_case, it's best guess is {}".format(s,best_guess))
+    print("While this function is unnsure how to convert '{}' to snake_case, its best guess is {}".format(s,best_guess))
     return best_guess
 
 def is_unique(xs):
