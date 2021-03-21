@@ -150,7 +150,9 @@ def args(field, nones, maintain_case):
     arg_list = []
     arg_list.append(f"load_from='{field}'.lower()")
     if maintain_case:
-        arg_list.append(f'dump_to="{field}"')
+        arg_list.append(f"dump_to='{field}'")
+    else:
+        arg_list.append(f"dump_to='{field.lower()}'")
     if nones != 0:
         arg_list.append('allow_none=True')
     return ', '.join(arg_list)
