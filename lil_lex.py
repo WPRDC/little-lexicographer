@@ -83,7 +83,7 @@ def date_or_datetime(options,values):
                 return 'datetime'
     return 'date'
 
-def choose_type(options,values):
+def choose_type(options, values, fieldname):
     selection = None
     for option in options:
         if type_hierarchy[option] > type_hierarchy[selection]:
@@ -93,6 +93,10 @@ def choose_type(options,values):
     # 2017-04-13 00:00 (with all times equal to midnight) are actually dates.
     if selection in ['datetime', 'date']:
         selection = date_or_datetime(options,values)
+
+    if fieldname.lower() in ['zip', 'zipcode', 'zip_code', 'zip code']:
+        if selection == 'int':
+            return 'text'
 
     return selection
 
@@ -202,7 +206,7 @@ def main():
                                     if not test_type(row[field],option):
                                         type_options.remove(option)
                     field_values = [row[field] for row in rows]
-                    field_type = choose_type(type_options, field_values)
+                    field_type = choose_type(type_options, field_values, field)
                     parameters['unique'][field] = is_unique(field_values)
                     print("{} {} {} {}".format(field, field_type, type_options, "   ALL UNIQUE" if parameters['unique'][field] else "    "))
                     if field_type is None:
