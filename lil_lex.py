@@ -129,7 +129,9 @@ def camelCase_to_snake_case(s):
     REG = r"(.+?)([A-Z])"
     def snake(match):
         return match.group(1).lower() + "_" + match.group(2).lower()
-    return re.sub(REG, snake, s, 0)
+    t = re.sub(REG, snake, s, 0)
+    u = re.sub('\s+_*', '_', t)
+    return u
 
 def snake_case(s):
     inferred_case = detect_case(s)
@@ -138,7 +140,7 @@ def snake_case(s):
     if inferred_case in ['camelCase']:
         return camelCase_to_snake_case(s)
     best_guess = re.sub("[^a-zA-Z0-9]+","_",s.lower())
-    print("While this function is unnsure how to convert '{}' to snake_case, its best guess is {}".format(s,best_guess))
+    #print("While this function is unnsure how to convert '{}' to snake_case, its best guess is {}".format(s,best_guess))
     return best_guess
 
 def is_unique(xs):
@@ -150,9 +152,9 @@ def args(field, nones, maintain_case):
     arg_list = []
     arg_list.append(f"load_from='{field}'.lower()")
     if maintain_case:
-        arg_list.append(f"dump_to='{field}'")
+        arg_list.append(f"dump_to='{snake_case(field)}'")
     else:
-        arg_list.append(f"dump_to='{field.lower()}'")
+        arg_list.append(f"dump_to='{snake_case(field.lower())}'")
     if nones != 0:
         arg_list.append('allow_none=True')
     return ', '.join(arg_list)
