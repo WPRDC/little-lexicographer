@@ -56,6 +56,13 @@ def test_type(value,candidate):
     if candidate == 'float':
         if re.match('^-?\d*\.\d+$',value) is not None or re.match('^-?\d+\.\d*$',value) is not None:
             return True
+        if re.match('^-?\d+$', value) is not None: # Integers can be valid float values.
+            return True
+        # Examples of scientific notation to deal with: 3e+05, 2e-04
+        if re.match('^-?\d\.\d+[eE][+-]*\d+$', value) is not None or re.match('^-?\d+[eE][+-]*\d+$',value) is not None:
+            print(f"{value} looks like it is in scientific notation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            return True
+
         return False
         #try:
         #    x = float(value)
