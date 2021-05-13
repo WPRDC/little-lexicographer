@@ -60,8 +60,8 @@ def test_type(value,candidate):
             return True
         # Examples of scientific notation to detect: 3e+05, 2e-04
         if re.match('^-?\d\.\d+[eE][+-]*\d+$', value) is not None or re.match('^-?\d+[eE][+-]*\d+$',value) is not None:
-            print(f"{value} looks like it is in scientific notation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            return True
+            print(f"{value} looks like it is in scientific notation! Because of the way the float type works, it's probably best to keep this as a string to avoid mangling precision.")
+            return False
 
         return False
         #try:
