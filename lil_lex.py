@@ -81,10 +81,10 @@ def test_type(value,candidate):
 def date_or_datetime(options,values):
     # Distinguishing between dates and datetimes could be done on length, but data that comes in like
     # 2017-04-13 00:00 (with all times equal to midnight) are actually dates.
-    if all([len(v) <= 10 for v in values]): # len('2019-04-13') == 10
+    if all([v is None or len(v) <= 10 for v in values]): # len('2019-04-13') == 10
         return 'date'
     for v in values:
-        if v not in ['', 'NA', 'N/A']:
+        if v not in ['', 'NA', 'N/A', None]:
             dt = parser.parse(v)
             if not(dt.hour == dt.minute == dt.second == 0):
                 return 'datetime'
