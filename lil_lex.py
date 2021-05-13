@@ -1,5 +1,7 @@
 import re, sys, csv
 
+from icecream import ic
+
 from collections import OrderedDict, defaultdict
 from dateutil import parser
 
@@ -201,23 +203,34 @@ def main():
                 for n,field in enumerate(headers):
                     field_type = None
                     value_example = None
-                    type_options = ['text','int','float','bool','datetime','date'] #'json','time']
+                    type_options = ['text', 'int', 'float', 'bool', 'datetime', 'date'] #'json', 'time']
+                    excluded_types = []
 
                     for row in rows:
+                        #if len(type_options) == 1: # This is an optimization that would speed up
+                        #    break # type detection, BUT it would miss some none values. A correct
+                        # none_count requires checking all values.
+                        type_candidates = [x for x in type_options if x not in excluded_types]
+
                         if field in row:
-                            if row[field] in [None,'']:
+                            if row[field] in [None, '', 'NA']:
                                 none_count[n] += 1
-                            if row[field] not in [None,''] and value_example is None:
+                            if row[field] not in [None, '', 'NA'] and value_example is None:
                                 value_example = row[field]
                             # Type elimination by brute force
                             if row[field] is not None:
-                                for option in type_options:
-                                    if not test_type(row[field],option):
-                                        type_options.remove(option)
+                                for option in type_candidates:
+                                    if field == 'from_street':
+                                        tt = test_type(row[field], option)
+                                    if not test_type(row[field], option):
+                                        excluded_types.append(option)
+
+                                        # [ ] This type-detection scheme fails to detect non-strings when 'NA' values are present.
                     field_values = [row[field] for row in rows]
-                    field_type = choose_type(type_options, field_values, field)
+                    type_candidates = [x for x in type_options if x not in excluded_types]
+                    field_type = choose_type(type_candidates, field_values, field)
                     parameters['unique'][field] = is_unique(field_values)
-                    print("{} {} {} {}".format(field, field_type, type_options, "   ALL UNIQUE" if parameters['unique'][field] else "    "))
+                    print("{} {} {} {}".format(field, field_type, type_candidates, "   ALL UNIQUE" if parameters['unique'][field] else "    "))
                     if field_type is None:
                         print("No values found for the field {}.".format(field))
                     if value_example is None:
