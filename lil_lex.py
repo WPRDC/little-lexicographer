@@ -204,6 +204,7 @@ def main():
                 # Remove the _id field added by CKAN, if it's there.
                 if '_id' in headers:
                     headers.remove('_id')
+                fix_nas = defaultdict(lambda: False)
                 for n,field in enumerate(headers):
                     field_type = None
                     value_example = None
@@ -233,6 +234,9 @@ def main():
                     field_values = [row[field] for row in rows]
                     type_candidates = [x for x in type_options if x not in excluded_types]
                     field_type = choose_type(type_candidates, field_values, field)
+
+                    if 'NA' in field_values:
+                        fix_nas[field] = True
                     parameters['unique'][field] = is_unique(field_values)
                     print("{} {} {} {}".format(field, field_type, type_candidates, "   ALL UNIQUE" if parameters['unique'][field] else "    "))
                     if field_type is None:
@@ -276,6 +280,11 @@ def main():
             for n,field in enumerate(headers):
                 s = f"{snake_case(field)} = fields.{schema_type[types[n]]}({args(field, none_count[n], maintain_case)})"
                 print(s)
+
+            tab = " "*4
+            print(f"\nclass Meta:\n{tab}ordered = True\n")
+            fields_with_nas = [f"'{field.lower()}'" for field, has_na in fix_nas.items() if has_na]
+            print(f"@pre_load\ndef fix_nas(self, data):\n{tab}fields_with_nas = [{', '.join(fields_with_nas)}]\n{tab}for f in fields_with_nas:\n{tab*2}if data[f] in ['NA']:\n{tab*3}data[f] = None\n")
 
             # [ ] Infer possible primary-key COMBINATIONS.
             # [ ] Detect field names that need to be put in load_from arguments.
