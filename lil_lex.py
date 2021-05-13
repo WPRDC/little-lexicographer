@@ -116,7 +116,7 @@ base_schema_type = {'text': 'String',
         'float': 'Float',
         'bool': 'Boolean',
         'date': 'Date',
-        'datetime': 'Datetime'}
+        'datetime': 'DateTime'}
 
 types_no_integers = dict(base_schema_type)
 types_no_integers['int'] = 'String'
