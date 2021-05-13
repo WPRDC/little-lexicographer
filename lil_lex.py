@@ -18,6 +18,8 @@ def test_type(value,candidate):
             if x.isoformat() == value:
                 #print(f"{value} is a datetime.")
                 return True
+            elif x.isoformat() == re.sub(' ', 'T', value): # Handle datetimes of the form "2021-05-12 21:52:00"
+                return True
             else:
                 #print(f"{value} is NOT a datetime.")
                 return False
