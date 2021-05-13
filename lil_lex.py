@@ -227,8 +227,6 @@ def main():
                             # Type elimination by brute force
                             if row[field] is not None:
                                 for option in type_candidates:
-                                    if field == 'from_street':
-                                        tt = test_type(row[field], option)
                                     if not test_type(row[field], option):
                                         excluded_types.append(option)
 
