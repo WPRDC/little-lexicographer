@@ -209,6 +209,8 @@ def main():
                 if '_id' in headers:
                     headers.remove('_id')
                 fix_nas = defaultdict(lambda: False)
+                value_distribution = defaultdict(lambda: defaultdict(int))
+
                 for n,field in enumerate(headers):
                     field_type = None
                     value_example = None
@@ -222,6 +224,7 @@ def main():
                         type_candidates = [x for x in type_options if x not in excluded_types]
 
                         if field in row:
+                            value_distribution[field][row[field]] += 1
                             if row[field] in [None, '', 'NA']:
                                 none_count[n] += 1
                             if row[field] not in [None, '', 'NA'] and value_example is None:
@@ -250,7 +253,21 @@ def main():
                     examples.append(value_example)
                     types.append(field_type)
 
+            print(f"#### VALUE DISTRIBUTION BY FIELD ####")
+            single_value_fields = {}
+            for field, dist in value_distribution.items():
+                if len(dist) == 1:
+                    value = list(dist.keys())[0]
+                    if value not in [None, '', 'NA']:
+                        single_value_fields[field] = value
+                if len(dist) <= 5:
+                    print(f"{field}: {dict(dist)} {'<============================' if len(dist) < 2 else ''}")
+                else:
+                    max_key = max(dist, key=dist.get)
+                    print(f'{field}: {max_key} ({dist[max_key]} rows) + {len(dist) - 1} other values')
+
             print("\n\nEMPTY FIELDS: {}".format([field for field in parameters['empty'] if parameters['empty'][field]]))
+            print(f"SINGLE-VALUE FIELDS: {single_value_fields}")
             print("POTENTIAL PRIMARY KEY FIELDS: {}".format([field for field in parameters['unique'] if parameters['unique'][field]]))
 
 
