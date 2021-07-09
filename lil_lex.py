@@ -146,7 +146,9 @@ def camelCase_to_snake_case(s):
     u = re.sub('\s+_*', '_', t)
     return u
 
-def snake_case(s):
+def snake_case(s, maintain_case=False):
+    if maintain_case:
+        return re.sub("[^a-zA-Z0-9]+", "_", s)
     inferred_case = detect_case(s)
     if inferred_case in ['upper','capitalized','snake_case']:
         return re.sub("[^a-zA-Z0-9]+","_",s.lower())
@@ -165,7 +167,7 @@ def args(field, nones, maintain_case):
     arg_list = []
     arg_list.append(f"load_from='{field}'.lower()")
     if maintain_case:
-        arg_list.append(f"dump_to='{snake_case(field)}'")
+        arg_list.append(f"dump_to='{snake_case(field, maintain_case)}'")
     else:
         arg_list.append(f"dump_to='{snake_case(field.lower())}'")
     if nones != 0:
