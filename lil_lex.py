@@ -182,6 +182,7 @@ def main():
     else:
         maintain_case = False
         no_integers = False
+        analyze_only = False
         if len(sys.argv) > 2:
             if 'maintain' in sys.argv[2:]:
                 maintain_case = True
@@ -189,6 +190,8 @@ def main():
                 no_integers = True
             if 'no_integers' in sys.argv[2:]:
                 no_integers = True
+            if 'analyze' in sys.argv[2:]:
+                analyze_only = True
 
         csv_file_path = sys.argv[1]
         if re.search('\.csv$', csv_file_path) is None:
@@ -270,40 +273,40 @@ def main():
             print(f"SINGLE-VALUE FIELDS: {single_value_fields}")
             print("POTENTIAL PRIMARY KEY FIELDS: {}".format([field for field in parameters['unique'] if parameters['unique'][field]]))
 
+            if not analyze_only:
+                list_of_dicts = []
+                for n,field in enumerate(headers):
+                    tuples = [('column', field),
+                            ('type', types[n]),
+                            ('label',''),
+                            ('description',''),
+                            ('example',examples[n])]
 
-            list_of_dicts = []
-            for n,field in enumerate(headers):
-                tuples = [('column', field),
-                        ('type', types[n]),
-                        ('label',''),
-                        ('description',''),
-                        ('example',examples[n])]
+                    list_of_dicts.append(OrderedDict(tuples))
+                row1 = list_of_dicts[0]
+                data_dictionary_fields = [tup for tup in row1]
+                data_dictionary_path = re.sub("\.csv","-data-dictionary.csv",csv_file_path)
+                with open(data_dictionary_path, 'w') as csvfile:
+                    writer = csv.DictWriter(csvfile, fieldnames=data_dictionary_fields)
+                    writer.writeheader()
+                    writer.writerows(list_of_dicts)
 
-                list_of_dicts.append(OrderedDict(tuples))
-            row1 = list_of_dicts[0]
-            data_dictionary_fields = [tup for tup in row1]
-            data_dictionary_path = re.sub("\.csv","-data-dictionary.csv",csv_file_path)
-            with open(data_dictionary_path, 'w') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=data_dictionary_fields)
-                writer.writeheader()
-                writer.writerows(list_of_dicts)
+                ### ETL Wizard functionality: Generate Marshamallow schema for ETL jobs
+                print("\n\n *** *** ** *  *   * ** *      * ** ***** * *   *")
+                schema_type = base_schema_type
+                if no_integers: # Lots of fields are coded as integers, but we want to switch them
+                    # to strings because they are just ID numbers that one should not do math with (like ward IDs).
+                    print("Coercing all integer fields to strings, since so many such fields are not actual counts.")
+                    schema_type = types_no_integers
 
-            ### ETL Wizard functionality: Generate Marshamallow schema for ETL jobs
-            print("\n\n *** *** ** *  *   * ** *      * ** ***** * *   *")
-            schema_type = base_schema_type
-            if no_integers: # Lots of fields are coded as integers, but we want to switch them
-                # to strings because they are just ID numbers that one should not do math with (like ward IDs).
-                print("Coercing all integer fields to strings, since so many such fields are not actual counts.")
-                schema_type = types_no_integers
+                for n,field in enumerate(headers):
+                    s = f"{snake_case(field)} = fields.{schema_type[types[n]]}({args(field, none_count[n], maintain_case)})"
+                    print(s)
 
-            for n,field in enumerate(headers):
-                s = f"{snake_case(field)} = fields.{schema_type[types[n]]}({args(field, none_count[n], maintain_case)})"
-                print(s)
-
-            tab = " "*4
-            print(f"\nclass Meta:\n{tab}ordered = True\n")
-            fields_with_nas = [f"'{field.lower()}'" for field, has_na in fix_nas.items() if has_na]
-            print(f"@pre_load\ndef fix_nas(self, data):\n{tab}fields_with_nas = [{', '.join(fields_with_nas)}]\n{tab}for f in fields_with_nas:\n{tab*2}if data[f] in ['NA']:\n{tab*3}data[f] = None\n")
+                tab = " "*4
+                print(f"\nclass Meta:\n{tab}ordered = True\n")
+                fields_with_nas = [f"'{field.lower()}'" for field, has_na in fix_nas.items() if has_na]
+                print(f"@pre_load\ndef fix_nas(self, data):\n{tab}fields_with_nas = [{', '.join(fields_with_nas)}]\n{tab}for f in fields_with_nas:\n{tab*2}if data[f] in ['NA']:\n{tab*3}data[f] = None\n")
 
             # [ ] Infer possible primary-key COMBINATIONS.
             # [ ] Detect field names that need to be put in load_from arguments.
