@@ -103,7 +103,7 @@ def choose_type(options, values, fieldname):
     if selection in ['datetime', 'date']:
         selection = date_or_datetime(options,values)
 
-    if fieldname.lower() in ['zip', 'zipcode', 'zip_code', 'zip code']:
+    if fieldname.lower() in ['zip', 'zipcode', 'zip_code', 'zip code'] or 'zip_code' in fieldname.lower() or 'zip code' in fieldname.lower():
         if selection == 'int':
             return 'text'
 
