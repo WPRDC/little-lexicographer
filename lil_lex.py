@@ -148,15 +148,21 @@ def camelCase_to_snake_case(s):
 
 def snake_case(s, maintain_case=False):
     if maintain_case:
-        return re.sub("[^a-zA-Z0-9]+", "_", s)
+        return re.sub("[^a-zA-Z0-9]", "_", s) # Change each such character to an underscore to better match
+        # the form of the original field name (which is needed by marshmallow for some unknown reason).
     inferred_case = detect_case(s)
     if inferred_case in ['upper','capitalized','snake_case']:
-        return re.sub("[^a-zA-Z0-9]+","_",s.lower())
+        return re.sub("[^a-zA-Z0-9]","_",s.lower())
     if inferred_case in ['camelCase']:
         return camelCase_to_snake_case(s)
-    best_guess = re.sub("[^a-zA-Z0-9]+","_",s.lower())
+    best_guess = re.sub("[^a-zA-Z0-9]","_",s.lower())
     #print("While this function is unnsure how to convert '{}' to snake_case, its best guess is {}".format(s,best_guess))
     return best_guess
+
+def eliminate_extra_underscores(s):
+    s = re.sub('_+', '_', s)
+    s = re.sub('^_', '', s)
+    return re.sub('_$', '', s)
 
 def is_unique(xs):
     if len(xs) > len(set(xs)):
@@ -167,9 +173,9 @@ def args(field, nones, maintain_case):
     arg_list = []
     arg_list.append(f"load_from='{field}'.lower()")
     if maintain_case:
-        arg_list.append(f"dump_to='{snake_case(field, maintain_case)}'")
+        arg_list.append(f"dump_to='{eliminate_extra_underscore(snake_case(field, maintain_case))}'")
     else:
-        arg_list.append(f"dump_to='{snake_case(field.lower())}'")
+        arg_list.append(f"dump_to='{eliminate_extra_underscores(snake_case(field.lower()))}'")
     if nones != 0:
         arg_list.append('allow_none=True')
     return ', '.join(arg_list)
