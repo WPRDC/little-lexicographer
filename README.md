@@ -64,6 +64,8 @@ site = 'https://data.wprdc.org'
 
 The data dictionary should be uploaded, filling in `label` and `description` values for the corresponding fields.
 
+Note that a partial data dictionary file (that is, one that covers only a subset of fields) can be "uploaded", and those fields will have their integrated-data-dictionary entries updated, while the others will remain unchanged.
+
 If you want to attempt to set types of some of the fields, add a `type_override` column to your data dictionary and run the script.
 Then you have to log in to your CKAN account on data.wprdc.org, find the resource, click on the 'Manage' button, switch to the 'Datastore' tab, and push the 'Upload to Datastore' button. You can monitor the Datastore upload progress by reloading that page, but eventually the type overrides should take effect.
 
