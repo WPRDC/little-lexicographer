@@ -1,5 +1,6 @@
 import ckanapi
 from pprint import pprint
+from icecream import ic
 
 def get_fields(site, resource_id, API_key=None):
     try:
@@ -71,11 +72,11 @@ def set_data_dictionary(site, resource_id, ref_fields, API_key):
     # Iterate through the fields in the data dictionary and try to apply them to the newly created data table.
     for field in present_fields:
         if field['id'] != '_id':
-            definition = next((f['info'] for f in ref_fields if f['id'] == field['id']), None)
+            definition = next((f['info'] for f in ref_fields if f['id'] == field['id']), None) # This contains both the label and the definition.
+            nf = dict(field)
             if definition is not None:
-                nf = dict(field)
                 nf['info'] = definition
-                new_fields.append(nf)
+            new_fields.append(nf)
 
     results = ckan.action.datastore_create(resource_id=resource_id, fields=new_fields, force=True)
     # The response without force=True is
