@@ -146,7 +146,11 @@ def camelCase_to_snake_case(s):
     u = re.sub('\s+_*', '_', t)
     return u
 
+def handle_forbidden_characters(s):
+    return re.sub('[\/:.]', '_', s)
+
 def snake_case(s, maintain_case=False):
+    s = handle_forbidden_characters(s)
     if maintain_case:
         return re.sub("[^a-zA-Z0-9]", "_", s) # Change each such character to an underscore to better match
         # the form of the original field name (which is needed by marshmallow for some unknown reason).
@@ -159,6 +163,11 @@ def snake_case(s, maintain_case=False):
     #print("While this function is unnsure how to convert '{}' to snake_case, its best guess is {}".format(s,best_guess))
     return best_guess
 
+def intermediate_format(s):
+    # This function attempts to take the original field name and return
+    # Marshmallow-ized version of it.
+    return re.sub('\s+', '_', s).lower()
+
 def eliminate_extra_underscores(s):
     s = re.sub('_+', '_', s)
     s = re.sub('^_', '', s)
@@ -169,13 +178,16 @@ def is_unique(xs):
         return False
     return True
 
+def dump_to_format(field, maintain_case=False):
+    return eliminate_extra_underscores(snake_case(field, maintain_case))
+
 def args(field, nones, maintain_case):
     arg_list = []
     arg_list.append(f"load_from='{field}'.lower()")
     if maintain_case:
-        arg_list.append(f"dump_to='{eliminate_extra_underscore(snake_case(field, maintain_case))}'")
+        arg_list.append(f"dump_to='{dump_to_format(field, maintain_case)}'")
     else:
-        arg_list.append(f"dump_to='{eliminate_extra_underscores(snake_case(field.lower()))}'")
+        arg_list.append(f"dump_to='{dump_to_format(field.lower())}'")
     if nones != 0:
         arg_list.append('allow_none=True')
     return ', '.join(arg_list)
@@ -311,7 +323,7 @@ def main():
 
                 tab = " "*4
                 print(f"\nclass Meta:\n{tab}ordered = True\n")
-                fields_with_nas = [f"'{field.lower()}'" for field, has_na in fix_nas.items() if has_na]
+                fields_with_nas = [f"'{intermediate_format(field)}'" for field, has_na in fix_nas.items() if has_na]
                 print(f"@pre_load\ndef fix_nas(self, data):\n{tab}fields_with_nas = [{', '.join(fields_with_nas)}]\n{tab}for f in fields_with_nas:\n{tab*2}if data[f] in ['NA', 'NULL']:\n{tab*3}data[f] = None\n")
 
             # [ ] Infer possible primary-key COMBINATIONS.
