@@ -10,7 +10,7 @@ type_hierarchy = {None: -1, 'text': 0, 'bool': 1, 'int': 2, 'float': 3, 'datetim
 def test_type(value,candidate):
     """Return True if the value might be of type candidate and False only if it is
     definitely not of type candidate."""
-    if value in ['', 'NA', 'N/A']:
+    if value in ['', 'NA', 'N/A', 'NULL']:
         return True
     if candidate == 'datetime':
         try:
@@ -86,7 +86,7 @@ def date_or_datetime(options,values):
     if all([v is None or len(v) <= 10 for v in values]): # len('2019-04-13') == 10
         return 'date'
     for v in values:
-        if v not in ['', 'NA', 'N/A', None]:
+        if v not in ['', 'NA', 'N/A', 'NULL', None]:
             dt = parser.parse(v)
             if not(dt.hour == dt.minute == dt.second == 0):
                 return 'datetime'
@@ -234,9 +234,9 @@ def main():
 
                         if field in row:
                             value_distribution[field][row[field]] += 1
-                            if row[field] in [None, '', 'NA']:
+                            if row[field] in [None, '', 'NA', 'NULL']:
                                 none_count[n] += 1
-                            if row[field] not in [None, '', 'NA'] and value_example is None:
+                            if row[field] not in [None, '', 'NA', 'NULL'] and value_example is None:
                                 value_example = row[field]
                             # Type elimination by brute force
                             if row[field] is not None:
@@ -249,7 +249,7 @@ def main():
                     type_candidates = [x for x in type_options if x not in excluded_types]
                     field_type = choose_type(type_candidates, field_values, field)
 
-                    if 'NA' in field_values:
+                    if 'NA' in field_values or 'NULL' in field_values:
                         fix_nas[field] = True
                     parameters['unique'][field] = is_unique(field_values)
                     print("{} {} {} {}".format(field, field_type, type_candidates, "   ALL UNIQUE" if parameters['unique'][field] else "    "))
@@ -267,7 +267,7 @@ def main():
             for field, dist in value_distribution.items():
                 if len(dist) == 1:
                     value = list(dist.keys())[0]
-                    if value not in [None, '', 'NA']:
+                    if value not in [None, '', 'NA', 'NULL']:
                         single_value_fields[field] = value
                 if len(dist) <= 5:
                     print(f"{field}: {dict(dist)} {'<============================' if len(dist) < 2 else ''}")
@@ -312,7 +312,7 @@ def main():
                 tab = " "*4
                 print(f"\nclass Meta:\n{tab}ordered = True\n")
                 fields_with_nas = [f"'{field.lower()}'" for field, has_na in fix_nas.items() if has_na]
-                print(f"@pre_load\ndef fix_nas(self, data):\n{tab}fields_with_nas = [{', '.join(fields_with_nas)}]\n{tab}for f in fields_with_nas:\n{tab*2}if data[f] in ['NA']:\n{tab*3}data[f] = None\n")
+                print(f"@pre_load\ndef fix_nas(self, data):\n{tab}fields_with_nas = [{', '.join(fields_with_nas)}]\n{tab}for f in fields_with_nas:\n{tab*2}if data[f] in ['NA', 'NULL']:\n{tab*3}data[f] = None\n")
 
             # [ ] Infer possible primary-key COMBINATIONS.
             # [ ] Detect field names that need to be put in load_from arguments.
