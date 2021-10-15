@@ -1,6 +1,7 @@
 import re, sys, csv
 
 from icecream import ic
+from beartype import beartype
 
 from collections import OrderedDict, defaultdict
 from dateutil import parser
@@ -181,7 +182,8 @@ def is_unique(xs):
 def dump_to_format(field, maintain_case=False):
     return eliminate_extra_underscores(snake_case(field, maintain_case))
 
-def args(field, nones, maintain_case):
+@beartype
+def args(field: str, nones: list, maintain_case: bool) -> str:
     arg_list = []
     arg_list.append(f"load_from='{field}'.lower()")
     if maintain_case:
