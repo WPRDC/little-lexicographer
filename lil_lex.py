@@ -1,4 +1,4 @@
-import re, sys, csv
+import re, sys, csv, pprint
 
 from icecream import ic
 from beartype import beartype
@@ -321,7 +321,7 @@ def main():
 
                 for n,field in enumerate(headers):
                     s = f"{snake_case(field)} = fields.{schema_type[types[n]]}({args(field, none_count[n], maintain_case)})"
-                    print(s)
+                    print(pprint.pformat(s, width=999).strip('"'))
 
                 tab = " "*4
                 print(f"\nclass Meta:\n{tab}ordered = True\n")
