@@ -183,7 +183,7 @@ def dump_to_format(field, maintain_case=False):
     return eliminate_extra_underscores(snake_case(field, maintain_case))
 
 @beartype
-def args(field: str, nones: list, maintain_case: bool) -> str:
+def args(field: str, nones: int, maintain_case: bool) -> str:
     arg_list = []
     arg_list.append(f"load_from='{field}'.lower()")
     if maintain_case:
