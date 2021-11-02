@@ -50,6 +50,10 @@ def test_type(value,candidate):
 
     if candidate == 'int':
         if re.match('^-?\d+$',value) is not None:
+            if value[0] == '0' and value.strip() != '0' and '.' not in value:
+                return False # Avoid reporting strings
+            # that start with '0' as potential integers.
+            # These should stay as strings.
             return True
         return False
         #try:
