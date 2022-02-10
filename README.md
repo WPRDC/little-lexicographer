@@ -1,5 +1,13 @@
 # Little Lexicographer
 
+## Setting up your environment
+
+Clone this repository, cd into the directory, and then create a new virtual environment: `python3 -m venv ve`.
+
+Activate the virtual environment: `source ve/bin/activate`
+
+Ensure that the virtual environment was indeed activated (your command prompt should now be preceded by `(ve)`, and install the requirements: `pip install -r requirements.txt`.
+
 ### Generating data dictionaries
 Whenever we publish new data on the [Western Pennsylvania Regional Data Center](https://www.wprdc.org)'s [open data portal](https://data.wprdc.org), we include a data dictionary to describe all the fields. To make this easier, I created a simple Python script that takes as a command-line argument the filename for a CSV file, scans its field values to try to infer the type, and then creates a data dictionary file (also in CSV format) with one row for each of the first file's fields, an example value for each field (not currently supported by the integrated data dictionary on data.wprdc.org), and blanks for field labels and optional additional description.
 
