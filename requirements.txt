@@ -1,0 +1,4 @@
+beartype==0.10.0
+ckanapi==4.6
+icecream==2.1.1
+python-dateutil==2.8.2
