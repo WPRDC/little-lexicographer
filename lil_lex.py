@@ -2,6 +2,7 @@ import re, sys, csv, pprint
 
 from icecream import ic
 from beartype import beartype
+from typing import Tuple
 
 from collections import OrderedDict, defaultdict
 from dateutil import parser
@@ -187,16 +188,17 @@ def dump_to_format(field, maintain_case=False):
     return eliminate_extra_underscores(snake_case(field, maintain_case))
 
 @beartype
-def args(field: str, nones: int, maintain_case: bool) -> str:
+def args(field: str, nones: int, maintain_case: bool) -> Tuple[str, str]:
     arg_list = []
     arg_list.append(f"load_from='{field}'.lower()")
     if maintain_case:
-        arg_list.append(f"dump_to='{dump_to_format(field, maintain_case)}'")
+        dump_to = dump_to_format(field, maintain_case)
     else:
-        arg_list.append(f"dump_to='{dump_to_format(field.lower())}'")
+        dump_to = dump_to_format(field.lower())
+    arg_list.append(f"dump_to='{dump_to}'")
     if nones != 0:
         arg_list.append('allow_none=True')
-    return ', '.join(arg_list)
+    return ', '.join(arg_list), dump_to
 
 def main():
     if len(sys.argv) < 2:
@@ -323,9 +325,15 @@ def main():
                     print("Coercing all integer fields to strings, since so many such fields are not actual counts.")
                     schema_type = types_no_integers
 
+                dump_tos = []
                 for n,field in enumerate(headers):
-                    s = f"{snake_case(field)} = fields.{schema_type[types[n]]}({args(field, none_count[n], maintain_case)})"
+                    arg_string, dump_to = args(field, none_count[n], maintain_case)
+                    s = f"{snake_case(field)} = fields.{schema_type[types[n]]}({arg_string})"
                     print(pprint.pformat(s, width=999).strip('"'))
+
+                    if dump_to in dump_tos:
+                        raise ValueError("That list dump_to name conflicts with one that's already in the schema!")
+                    dump_tos.append(dump_to)
 
                 tab = " "*4
                 print(f"\nclass Meta:\n{tab}ordered = True\n")
