@@ -127,6 +127,10 @@ def choose_type(options, values, fieldname):
         if selection == 'int':                           # force it to be a string.
             return 'text'
 
+    if fieldname.lower() in ['geoid', 'id']: # If it's an ID interpreted as an integer,
+        if selection == 'int':                           # force it to be a string.
+            return 'text'
+
     return selection
 
 base_schema_type = {'text': 'String',
