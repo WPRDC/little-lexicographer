@@ -66,9 +66,19 @@ def test_type(value,candidate):
     if candidate == 'float':
         if re.match('^-?\d*\.\d+$',value) is not None or re.match('^-?\d+\.\d*$',value) is not None:
             return True
+        # Even if it doesn't contain a decimal point, it could be an integer, and an integer
+        # could occur in a column that is mostly floats (where the type of the column should
+        # be float).
+        ## The section below can let integers pass, but this creates false positives, misidentifying all
+        ## integer fields as floats. Instead, we need to restructure the whole process to flip a
+        ## field to a float if it's all integers except for one value which is identified as a float.
+
+        ## if re.match('^-?\d+$',value) is not None:
+        ##     if value[0] != '0' or value.strip() == '0':
+        ##         return True
         # Examples of scientific notation to detect: 3e+05, 2e-04
         if re.match('^-?\d\.\d+[eE][+-]*\d+$', value) is not None or re.match('^-?\d+[eE][+-]*\d+$',value) is not None:
-            print(f"{value} looks like it is in scientific notation! Because of the way the float type works, it's probably best to keep this as a string to avoid mangling precision.")
+            print(f"{value} looks like it is in scientific notation! Because of the way the float type works, it's probably best to keep this as a string to avoid mangling precision. [Actually, this is a judgment call that depends on the situation. Marshmallow WILL convert 2e-4 to 0.0002.]")
             return False
 
         return False
