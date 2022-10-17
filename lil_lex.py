@@ -175,13 +175,16 @@ def snake_case(s, maintain_case=False):
         return re.sub("[^a-zA-Z0-9]", "_", s) # Change each such character to an underscore to better match
         # the form of the original field name (which is needed by marshmallow for some unknown reason).
     inferred_case = detect_case(s)
-    if inferred_case in ['upper','capitalized','snake_case']:
-        return re.sub("[^a-zA-Z0-9]","_",s.lower())
-    if inferred_case in ['camelCase']:
-        return camelCase_to_snake_case(s)
-    best_guess = re.sub("[^a-zA-Z0-9]","_",s.lower())
-    #print("While this function is unnsure how to convert '{}' to snake_case, its best guess is {}".format(s,best_guess))
-    return best_guess
+    s = re.sub("[,-]", '_', s)
+    if inferred_case in ['upper', 'capitalized', 'snake_case', 'Unknown']:
+        s = re.sub("[^a-zA-Z0-9#]", "_", s.lower())
+    elif inferred_case in ['camelCase']:
+        s = camelCase_to_snake_case(s).lower()
+    else:
+        s = best_guess = re.sub("[^a-zA-Z0-9#]", "_", s.lower())
+        #print("While this function is unnsure how to convert '{}' to snake_case, its best guess is {}".format(s,best_guess))
+    s = re.sub("_+", "_", s)
+    return s
 
 def intermediate_format(s):
     # This function attempts to take the original field name and return
@@ -204,7 +207,7 @@ def dump_to_format(field, maintain_case=False):
 @beartype
 def args(field: str, nones: int, maintain_case: bool) -> Tuple[str, str]:
     arg_list = []
-    arg_list.append(f"load_from='{field}'.lower()")
+    arg_list.append(f"load_from='{snake_case(field)}'")
     if maintain_case:
         dump_to = dump_to_format(field, maintain_case)
     else:
