@@ -183,7 +183,6 @@ def snake_case(s, maintain_case=False):
     else:
         s = best_guess = re.sub("[^a-zA-Z0-9#\ufeff]", "_", s.lower())
         #print("While this function is unnsure how to convert '{}' to snake_case, its best guess is {}".format(s,best_guess))
-    s = re.sub("_+", "_", s)
     return s
 
 def intermediate_format(s):
