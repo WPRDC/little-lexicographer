@@ -177,11 +177,11 @@ def snake_case(s, maintain_case=False):
     inferred_case = detect_case(s)
     s = re.sub("[,-]", '_', s)
     if inferred_case in ['upper', 'capitalized', 'snake_case', 'Unknown']:
-        s = re.sub("[^a-zA-Z0-9#]", "_", s.lower())
+        s = re.sub("[^a-zA-Z0-9#\ufeff]", "_", s.lower())
     elif inferred_case in ['camelCase']:
         s = camelCase_to_snake_case(s).lower()
     else:
-        s = best_guess = re.sub("[^a-zA-Z0-9#]", "_", s.lower())
+        s = best_guess = re.sub("[^a-zA-Z0-9#\ufeff]", "_", s.lower())
         #print("While this function is unnsure how to convert '{}' to snake_case, its best guess is {}".format(s,best_guess))
     s = re.sub("_+", "_", s)
     return s
@@ -196,12 +196,21 @@ def eliminate_extra_underscores(s):
     s = re.sub('^_', '', s)
     return re.sub('_$', '', s)
 
+def eliminate_BOM(s):
+    # It is reputedly possible to work around the BOM character
+    # if one loads the file with a utf-sig-8 encoding, but I have
+    # not gotten that to work, so I'm selectively eliminating it
+    # to preserve it in the load_to part of the schema but
+    # get ride of it elsewhere.
+    return re.sub(u'\ufeff', '', s)
+
 def is_unique(xs):
     if len(xs) > len(set(xs)):
         return False
     return True
 
 def dump_to_format(field, maintain_case=False):
+    field = eliminate_BOM(field)
     return eliminate_extra_underscores(snake_case(field, maintain_case))
 
 @beartype
@@ -345,7 +354,7 @@ def main():
                 dump_tos = []
                 for n,field in enumerate(headers):
                     arg_string, dump_to = args(field, none_count[n], maintain_case)
-                    s = f"{snake_case(field)} = fields.{schema_type[types[n]]}({arg_string})"
+                    s = f"{eliminate_BOM(snake_case(field))} = fields.{schema_type[types[n]]}({arg_string})"
                     print(pprint.pformat(s, width=999).strip('"'))
 
                     if dump_to in dump_tos:
