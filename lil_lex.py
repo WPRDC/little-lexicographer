@@ -167,7 +167,9 @@ def camelCase_to_snake_case(s):
     return u
 
 def handle_forbidden_characters(s):
-    return re.sub('[\/:.]', '_', s)
+    return re.sub('[\/:]', '_', s)
+    # Maybe the periods need to be presevered in the load_from part
+    # because of rocket-etl's schema/source comparisons?
 
 def snake_case(s, maintain_case=False):
     s = handle_forbidden_characters(s)
@@ -176,10 +178,10 @@ def snake_case(s, maintain_case=False):
         # the form of the original field name (which is needed by marshmallow for some unknown reason).
     inferred_case = detect_case(s)
     s = re.sub("[,-]", '_', s)
-    if inferred_case in ['upper', 'capitalized', 'snake_case', 'Unknown']:
-        s = re.sub("[^a-zA-Z0-9#\ufeff]", "_", s.lower())
-    elif inferred_case in ['camelCase']:
-        s = camelCase_to_snake_case(s).lower()
+    if inferred_case in ['upper', 'capitalized', 'snake_case', 'Unknown', 'camelCase']:
+        s = re.sub("[^a-zA-Z0-9.#\ufeff]", "_", s.lower())
+#    elif inferred_case in ['camelCase']:
+#        s = camelCase_to_snake_case(s).lower()
     else:
         s = best_guess = re.sub("[^a-zA-Z0-9#\ufeff]", "_", s.lower())
         #print("While this function is unnsure how to convert '{}' to snake_case, its best guess is {}".format(s,best_guess))
@@ -203,13 +205,17 @@ def eliminate_BOM(s):
     # get ride of it elsewhere.
     return re.sub(u'\ufeff', '', s)
 
+def convert_dots(s):
+    return re.sub('[.]', '_', s) # We want dots in the load_from
+    # part, but not the dump_to part or the variable name.
+
 def is_unique(xs):
     if len(xs) > len(set(xs)):
         return False
     return True
 
 def dump_to_format(field, maintain_case=False):
-    field = eliminate_BOM(field)
+    field = convert_dots(eliminate_BOM(field))
     return eliminate_extra_underscores(snake_case(field, maintain_case))
 
 @beartype
@@ -353,7 +359,7 @@ def main():
                 dump_tos = []
                 for n,field in enumerate(headers):
                     arg_string, dump_to = args(field, none_count[n], maintain_case)
-                    s = f"{eliminate_BOM(snake_case(field))} = fields.{schema_type[types[n]]}({arg_string})"
+                    s = f"{convert_dots(eliminate_BOM(snake_case(field)))} = fields.{schema_type[types[n]]}({arg_string})"
                     print(pprint.pformat(s, width=999).strip('"'))
 
                     if dump_to in dump_tos:
