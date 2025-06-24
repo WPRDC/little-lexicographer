@@ -71,12 +71,15 @@ def convert_fields_to_list_of_dicts(fields):
     return rows
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    if len(sys.argv) not in [2, 3]:
         raise ValueError("Please specify the resource ID of the CKAN table that is the source for the integrated data dictionary.\nUsage:\n   > python download_data_dictionary.py <CKAN resource ID>")
     source_resource_id = sys.argv[1]
+    save_filename =  f'{source_resource_id}-data-dictionary.csv'
+    if len(sys.argv) == 3:
+        save_filename = sys.argv[2]
 
     fields = get_data_dictionary(site, source_resource_id, API_key)
 
     field_dicts = convert_fields_to_list_of_dicts(fields)
-    write_to_csv(f'{source_resource_id}-data-dictionary.csv', field_dicts, ['column', 'type', 'label', 'description'])
-    print(f"Wrote data dictionary to local file: {source_resource_id}-data-dictionary.csv")
+    write_to_csv(save_filename, field_dicts, ['column', 'type', 'label', 'description'])
+    print(f"Wrote data dictionary to local file: {save_filename}")
