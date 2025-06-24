@@ -63,7 +63,7 @@ if __name__ == '__main__':
     destination_name = get_resource_name(site, destination_resource_id, API_key)
     destination_package_name = get_package_name_from_resource_id(site, destination_resource_id, API_key)
 
-    print(f'Preparing to clone data dictionary from {source_name} ({source_package_name}) to {destination_name} ({destination_package_name}...')
+    print(f'Preparing to clone data dictionary from {source_name} ({source_package_name}) to {destination_name} ({destination_package_name})...')
     time.sleep(4)
     print('On you mark! Get set!')
     time.sleep(1)
