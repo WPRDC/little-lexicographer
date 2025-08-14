@@ -72,7 +72,7 @@ def set_data_dictionary(site, resource_id, ref_fields, API_key):
     # Iterate through the fields in the data dictionary and try to apply them to the newly created data table.
     for field in present_fields:
         if field['id'] != '_id':
-            definition = next((f['info'] for f in ref_fields if f['id'] == field['id']), None) # This contains both the label and the definition.
+            definition = next((f.get('info', None) for f in ref_fields if f['id'] == field['id']), None) # This contains both the label and the definition.
             nf = dict(field)
             if definition is not None:
                 nf['info'] = definition
