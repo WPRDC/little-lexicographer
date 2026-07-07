@@ -148,13 +148,13 @@ types_no_integers['int'] = 'String'
 def detect_case(s):
     if s == s.upper():
         return 'upper'
-    if re.sub("[^a-zA-Z0-9]+","_",s.lower()) == s:
+    if re.sub(r"[^a-zA-Z0-9]+", "_", s.lower()) == s:
         return 'snake_case'
-    sp = re.sub("[^a-zA-Z0-9]+","_",s)
+    sp = re.sub(r"[^a-zA-Z0-9]+", "_", s)
     words = sp.split("_")
     if all([word == word.capitalize() for word in words]):
         return 'capitalized'
-    if re.match('([A-Z0-9]*[a-z][a-z0-9]*[A-Z]|[a-z0-9]*[A-Z][A-Z0-9]*[a-z])[A-Za-z0-9]*',s) is not None:
+    if re.match(r'([A-Z0-9]*[a-z][a-z0-9]*[A-Z]|[a-z0-9]*[A-Z][A-Z0-9]*[a-z])[A-Za-z0-9]*', s) is not None:
         return 'camelCase'
     return 'Unknown' # Work on detecting camelCase
 
@@ -163,39 +163,39 @@ def camelCase_to_snake_case(s):
     def snake(match):
         return match.group(1).lower() + "_" + match.group(2).lower()
     t = re.sub(REG, snake, s, 0)
-    u = re.sub('\s+_*', '_', t)
+    u = re.sub(r'\s+_*', '_', t)
     return u
 
 def handle_forbidden_characters(s):
-    return re.sub('[\/:]', '_', s)
+    return re.sub(r'[\/:]', '_', s)
     # Maybe the periods need to be presevered in the load_from part
     # because of rocket-etl's schema/source comparisons?
 
 def snake_case(s, maintain_case=False):
     s = handle_forbidden_characters(s)
     if maintain_case:
-        return re.sub("[^a-zA-Z0-9]", "_", s) # Change each such character to an underscore to better match
+        return re.sub(r"[^a-zA-Z0-9]", "_", s) # Change each such character to an underscore to better match
         # the form of the original field name (which is needed by marshmallow for some unknown reason).
     inferred_case = detect_case(s)
-    s = re.sub("[,-]", '_', s)
+    s = re.sub(r"[,-]", '_', s)
     if inferred_case in ['upper', 'capitalized', 'snake_case', 'Unknown', 'camelCase']:
-        s = re.sub("[^a-zA-Z0-9.#\ufeff]", "_", s.lower())
+        s = re.sub(r"[^a-zA-Z0-9.#\ufeff]", "_", s.lower())
 #    elif inferred_case in ['camelCase']:
 #        s = camelCase_to_snake_case(s).lower()
     else:
-        s = best_guess = re.sub("[^a-zA-Z0-9#\ufeff]", "_", s.lower())
+        s = best_guess = re.sub(r"[^a-zA-Z0-9#\ufeff]", "_", s.lower())
         #print("While this function is unnsure how to convert '{}' to snake_case, its best guess is {}".format(s,best_guess))
     return s
 
 def intermediate_format(s):
     # This function attempts to take the original field name and return
     # Marshmallow-ized version of it.
-    return re.sub('\s+', '_', s).lower()
+    return re.sub(r'\s+', '_', s).lower()
 
 def eliminate_extra_underscores(s):
-    s = re.sub('_+', '_', s)
-    s = re.sub('^_', '', s)
-    return re.sub('_$', '', s)
+    s = re.sub(r'_+', '_', s)
+    s = re.sub(r'^_', '', s)
+    return re.sub(r'_$', '', s)
 
 def eliminate_BOM(s):
     # It is reputedly possible to work around the BOM character
@@ -206,7 +206,7 @@ def eliminate_BOM(s):
     return re.sub(u'\ufeff', '', s)
 
 def convert_dots(s):
-    return re.sub('[.]', '_', s) # We want dots in the load_from
+    return re.sub(r'[.]', '_', s) # We want dots in the load_from
     # part, but not the dump_to part or the variable name.
 
 def is_unique(xs):
@@ -251,7 +251,7 @@ def main():
                 analyze_only = True
 
         csv_file_path = sys.argv[1]
-        if re.search('\.csv$', csv_file_path) is None:
+        if re.search(r'\.csv$', csv_file_path) is None:
             print('This whole fragile thing falls apart if the file name does not end in ".csv". Sorry.')
         else:
             with open(csv_file_path) as csvfile:
@@ -305,9 +305,9 @@ def main():
                     parameters['unique'][field] = is_unique(field_values)
                     print("{} {} {} {}".format(field, field_type, type_candidates, "   ALL UNIQUE" if parameters['unique'][field] else "    "))
                     if field_type is None:
-                        print("No values found for the field {}.".format(field))
+                        print("No values found for the field {field}.")
                     if value_example is None:
-                        print("values: No values found for the field {}.".format(field))
+                        print("values: No values found for the field {field}.")
                         parameters['empty'][field] = True # Defaults to False because of the defaultdict.
                         field_type = 'text' # Override any other field_type and use text when no value was found.
                     examples.append(value_example)
@@ -332,7 +332,7 @@ def main():
 
             if not analyze_only:
                 list_of_dicts = []
-                for n,field in enumerate(headers):
+                for n, field in enumerate(headers):
                     tuples = [('column', field),
                             ('type', types[n]),
                             ('label',''),
@@ -342,7 +342,7 @@ def main():
                     list_of_dicts.append(OrderedDict(tuples))
                 row1 = list_of_dicts[0]
                 data_dictionary_fields = [tup for tup in row1]
-                data_dictionary_path = re.sub("\.csv","-data-dictionary.csv",csv_file_path)
+                data_dictionary_path = re.sub(r"\.csv", "-data-dictionary.csv", csv_file_path)
                 with open(data_dictionary_path, 'w') as csvfile:
                     writer = csv.DictWriter(csvfile, fieldnames=data_dictionary_fields)
                     writer.writeheader()
@@ -357,7 +357,7 @@ def main():
                     schema_type = types_no_integers
 
                 dump_tos = []
-                for n,field in enumerate(headers):
+                for n, field in enumerate(headers):
                     arg_string, dump_to = args(field, none_count[n], maintain_case)
                     s = f"{convert_dots(eliminate_BOM(snake_case(field)))} = fields.{schema_type[types[n]]}({arg_string})"
                     print(pprint.pformat(s, width=999).strip('"'))
