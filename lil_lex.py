@@ -50,7 +50,7 @@ def test_type(value,candidate):
         return True
 
     if candidate == 'int':
-        if re.match('^-?\d+$',value) is not None:
+        if re.match(r'^-?\d+$', value) is not None:
             if value[0] == '0' and value.strip() != '0' and '.' not in value:
                 return False # Avoid reporting strings
             # that start with '0' as potential integers.
@@ -64,7 +64,7 @@ def test_type(value,candidate):
         #return True
 
     if candidate == 'float':
-        if re.match('^-?\d*\.\d+$',value) is not None or re.match('^-?\d+\.\d*$',value) is not None:
+        if re.match(r'^-?\d*\.\d+$', value) is not None or re.match(r'^-?\d+\.\d*$', value) is not None:
             return True
         # Even if it doesn't contain a decimal point, it could be an integer, and an integer
         # could occur in a column that is mostly floats (where the type of the column should
@@ -77,7 +77,7 @@ def test_type(value,candidate):
         ##     if value[0] != '0' or value.strip() == '0':
         ##         return True
         # Examples of scientific notation to detect: 3e+05, 2e-04
-        if re.match('^-?\d\.\d+[eE][+-]*\d+$', value) is not None or re.match('^-?\d+[eE][+-]*\d+$',value) is not None:
+        if re.match(r'^-?\d\.\d+[eE][+-]*\d+$', value) is not None or re.match(r'^-?\d+[eE][+-]*\d+$', value) is not None:
             print(f"{value} looks like it is in scientific notation! Because of the way the float type works, it's probably best to keep this as a string to avoid mangling precision. [Actually, this is a judgment call that depends on the situation. Marshmallow WILL convert 2e-4 to 0.0002.]")
             return False
 
