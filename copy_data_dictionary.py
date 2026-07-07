@@ -58,6 +58,8 @@ if __name__ == '__main__':
         print("Please specify two resource IDs, one for the source of the data dictionary and one for the destination.")
     source_resource_id, destination_resource_id = sys.argv[1], sys.argv[2]
 
+    if source_resource_id == destination_resource_id:
+        raise ValueError(f'It makes no sense to copy a data dictionary from one resource to itself! ({source_resource_id} == {destination_resource_id})')
     source_name = get_resource_name(site, source_resource_id, API_key)
     source_package_name = get_package_name_from_resource_id(site, source_resource_id, API_key)
     destination_name = get_resource_name(site, destination_resource_id, API_key)
