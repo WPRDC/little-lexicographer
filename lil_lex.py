@@ -119,15 +119,15 @@ def choose_type(options, values, fieldname):
     if selection in ['datetime', 'date']:
         selection = date_or_datetime(options,values)
 
-    if fieldname.lower() in ['zip', 'zipcode', 'zip_code', 'zip code'] or 'zip_code' in fieldname.lower() or 'zip code' in fieldname.lower():
+    if fieldname.lower() in ['zip', 'zipcode', 'zip_code', 'zip code', 'ward', 'council_district', 'police_zone', 'fire_zone'] or 'zip_code' in fieldname.lower() or 'zip code' in fieldname.lower():
         if selection == 'int':
             return 'text'
 
-    if re.search('_id$', fieldname.lower()) is not None: # If it's an ID interpreted as an integer,
+    if re.search(r'_id$', fieldname.lower()) is not None: # If it's an ID interpreted as an integer,
         if selection == 'int':                           # force it to be a string.
             return 'text'
 
-    if fieldname.lower() in ['geoid', 'id']: # If it's an ID interpreted as an integer,
+    if fieldname.lower() in ['geoid', 'id', 'objectid', '\ufeffobjectid']: # If it's an ID interpreted as an integer,
         if selection == 'int':                           # force it to be a string.
             return 'text'
 
